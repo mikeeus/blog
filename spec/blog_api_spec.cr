@@ -34,16 +34,11 @@ describe App do
 
     it "creates post" do
       user = UserBox.create
+      token = user.generate_token
 
-      visitor.post("/posts", ({
-        "post:title" => "New Post",
-        "post:content" => "Probably the best post you've ever read",
-        "post:published_at" => Time.now.to_s,
-        "post:tags" => "dope, informative",
-        "post:comment_id" => "1"
-      }))
+      visitor.post("/posts", new_post_data, { "Authorization" => token })
 
-      visitor.response_body["title"].should eq "New Post"
+      visitor.response_body["title"].should eq new_post_data["post:title"]
     end
   end
 
@@ -57,7 +52,7 @@ describe App do
       }))
 
       visitor.response.status_code.should eq 200
-      visitor.response.headers["Authorization"].should contain "Bearer"
+      visitor.response.headers["Authorization"].should_not be_nil
     end
 
     it "rejects invalid user" do
@@ -79,12 +74,25 @@ describe App do
         "sign_up:password_confirmation" => "password"
       }))
 
-      pp visitor.response
-
       visitor.response.status_code.should eq 200
-      visitor.response.headers["Authorization"].should contain "Bearer"
+      visitor.response.headers["Authorization"].should_not be_nil
 
       UserQuery.new.email("test@email.com").first.should_not be_nil
     end
+
+    it "rejects unauthenticated requests to protected actions" do
+      visitor.post("/posts", new_post_data)
+      visitor.response.status_code.should eq 401
+    end
   end
+end
+
+def new_post_data
+  ({
+    "post:title" => "New Post",
+    "post:content" => "Probably the best post you've ever read",
+    "post:published_at" => Time.now.to_s,
+    "post:tags" => "dope, informative",
+    "post:comment_id" => "1"
+  })
 end
