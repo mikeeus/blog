@@ -1,10 +1,8 @@
 class Auth::SignIn < ApiAction
-  include GenerateToken
-
   post "/auth/sign_in" do
     SignInForm.new(params).submit do |form, user|
       if user
-        context.response.headers.add "Authorization", "Bearer #{generate_token(user)}"
+        context.response.headers.add "Authorization", user.generate_token
         head 200
       else
         head 401
