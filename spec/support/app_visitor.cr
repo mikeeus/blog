@@ -13,7 +13,7 @@ class AppVisitor
 
   def put(path : String, body : Hash(String, String), headers_hash : Hash(String, String)? = nil)
     headers = headers_hash ? hash_to_headers(headers_hash) : nil
-    request_with_body("PUT", path, with_csrf_token(body))
+    request_with_body("PUT", path, with_csrf_token(body), headers)
   end
 
   def post(path : String, body : Hash(String, String), headers_hash : Hash(String, String)? = nil)
