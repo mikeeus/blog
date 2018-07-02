@@ -49,9 +49,7 @@ describe App do
 
   describe "auth" do
     it "signs in valid user" do
-      user = UserBox.new.email("hello@mikias.net")
-        .encrypted_password(Authentic.generate_encrypted_password("password"))
-        .create
+      user = UserBox.new.create
 
       visitor.post("/auth/sign_in", ({
         "sign_in:email" => user.email,
