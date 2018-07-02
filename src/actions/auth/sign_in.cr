@@ -1,5 +1,3 @@
-require "jwt"
-
 class Auth::SignIn < ApiAction
   include GenerateToken
 
