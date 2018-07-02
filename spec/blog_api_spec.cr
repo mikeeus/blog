@@ -59,5 +59,28 @@ describe App do
       visitor.response.status_code.should eq 200
       visitor.response.headers["Authorization"].should contain "Bearer"
     end
+
+    it "rejects invalid user" do
+      user = UserBox.new.create
+
+      visitor.post("/auth/sign_in", ({
+        "sign_in:email" => "wrong email",
+        "sign_in:password" => "password"
+      }))
+
+      visitor.response.status_code.should eq 401
+    end
+
+    it "creates user on sign up" do
+      visitor.post("/auth/sign_up", ({
+        "sign_in:email" => "test@email.com",
+        "sign_in:password" => "password"
+      }))
+
+      visitor.response.status_code.should eq 200
+      visitor.response.headers["Authorization"].should contain "Bearer"
+
+      UserQuery.new.email("test@email.com").first.should_not be_nil
+    end
   end
 end
