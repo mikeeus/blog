@@ -73,9 +73,13 @@ describe App do
 
     it "creates user on sign up" do
       visitor.post("/auth/sign_up", ({
-        "sign_in:email" => "test@email.com",
-        "sign_in:password" => "password"
+        "sign_up:name" => "New User",
+        "sign_up:email" => "test@email.com",
+        "sign_up:password" => "password",
+        "sign_up:password_confirmation" => "password"
       }))
+
+      pp visitor.response
 
       visitor.response.status_code.should eq 200
       visitor.response.headers["Authorization"].should contain "Bearer"
