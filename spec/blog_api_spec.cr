@@ -46,4 +46,20 @@ describe App do
       visitor.response_body["title"].should eq "New Post"
     end
   end
+
+  describe "auth" do
+    it "signs in valid user" do
+      user = UserBox.new.email("hello@mikias.net")
+        .encrypted_password(Authentic.generate_encrypted_password("password"))
+        .create
+
+      visitor.post("/auth/sign_in", ({
+        "sign_in:email" => user.email,
+        "sign_in:password" => "password"
+      }))
+
+      visitor.response.status_code.should eq 200
+      visitor.response.headers["Authorization"].should contain "Bearer"
+    end
+  end
 end
