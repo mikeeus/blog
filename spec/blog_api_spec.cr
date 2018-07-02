@@ -45,6 +45,36 @@ describe App do
       visitor.post("/posts", new_post_data)
       visitor.response.status_code.should eq 401
     end
+
+    it "updates own posts" do
+      user = UserBox.create
+      post = PostBox.new.user_id(user.id).title("Old name").create
+
+      visitor.put(
+        "/posts/#{post.id}",
+        ({ "post:title" => "New name" }),
+        { "Authorization" => user.generate_token }
+      )
+
+      visitor.response.status_code.should eq 200
+      PostQuery.find(post.id).title.should eq "New name"
+    end
+
+    it "can't update another user's posts" do
+      user1 = UserBox.new.email("1@mikias.net").create
+      post = PostBox.new.user_id(user1.id).title("Old name").create
+
+      user2 = UserBox.new.email("2@mikias.net").create      
+
+      visitor.put(
+        "/posts/#{post.id}",
+        ({ "post:title" =>   "New name" }),
+        { "Authorization" => user2.generate_token }
+      )
+
+      visitor.response.status_code.should eq 401
+      PostQuery.find(post.id).title.should eq "Old name"
+    end
   end
 
   describe "auth" do

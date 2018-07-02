@@ -1,5 +1,12 @@
-class Posts::Update < ApiAction
+class Posts::Update < AuthenticatedAction
   route do
-    text "Render something in Posts::Update"
+    post = PostQuery.new.preload_user.find(id)
+
+    if post.user == @current_user
+      post = PostForm.update!(post, params)
+      json Posts::ShowSerializer.new(post: post), Status::OK
+    else
+      head 401
+    end
   end
 end
