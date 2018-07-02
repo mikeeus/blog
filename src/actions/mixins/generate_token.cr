@@ -1,3 +1,5 @@
+require "jwt"
+
 module GenerateToken
   private def generate_token(user : User)
     exp = Time.now.epoch + 60 * 60
